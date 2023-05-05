@@ -48,18 +48,18 @@ class Tape():
     def read(self, pointer: int) -> str:
         def seek_delay(head: int, pointer: int) -> None:
             time.sleep(abs(head - pointer) / 10)
-        def read_delay(nbytes: int) -> None:
-            time.sleep(nbytes / 10)
+        def read_delay() -> None:
+            time.sleep(self.nbytes / 10)
         if pointer > self.length:
             logging.debug(f'Pointer {pointer} is out of range')
             return None
         seek_delay(self.head, pointer)
         self.head = pointer
-        if pointer + nbytes > self.length:
-            nbytes = self.length - pointer
-        logging.debug(f'Reading {nbytes} bytes from {pointer}')
-        read_delay(nbytes)
-        data = self.tape[pointer:pointer+nbytes]
+        if pointer + self.nbytes > self.length:
+            self.nbytes = self.length - pointer
+        logging.debug(f'Reading {self.nbytes} bytes from {pointer}')
+        read_delay()
+        data = self.tape[pointer:pointer+self.nbytes]
         data = data.decode('utf-8')
         return data
 
