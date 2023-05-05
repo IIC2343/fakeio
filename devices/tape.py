@@ -17,6 +17,14 @@ class Tape():
         self.target_dir = 0x00
     
     @property
+    def head(self) -> int:
+        return self.head
+
+    @head.setter
+    def head(self, value: int) -> None:
+        self.read(value)
+    
+    @property
     def nbytes(self) -> int:
         return self.nbytes
 
