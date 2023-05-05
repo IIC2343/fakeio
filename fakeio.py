@@ -10,30 +10,115 @@ import instructions as ins
 LOGS = os.path.join(os.path.dirname(__file__), './logs/computer.logs')
 
 class Computer():
-    def __init__(self, program_path: str) -> None:
+    def __init__(self, program_path: str, echo: bool=False) -> None:
         logging.basicConfig(filename=LOGS, level=logging.DEBUG, filemode='a')
-        self.cpu = self.CPU()
+        self.cpu = self.CPU(echo)
         self.ram = self.RAM()
         self.rom = self.ROM(program_path)
-        self.Coprocessor = dv.Coprocessor()
-        self.entropy = dv.Entropy()
-        self.printer = dv.Printer()
-        self.tape = dv.Tape()
-    
+        self.devices = {
+            "printer": dv.Printer(), "coprocessor": dv.Coprocessor(), "entropy": dv.Entropy(), "tape": dv.Tape()
+        }
+        
 
     class CPU():
-        def __init__(self) -> None:
+        def __init__(self, echo: bool = False) -> None:
             self.csr = bytearray(0x00 for _ in range(0, 1))
             self.dreg = {"A": int(), "B": int()}
-            self.pc = int()
-            self.z = bool()
+            self.echo = echo
 
         def run(self) -> None:
             logging.debug('CPU is running')
+            for inst in self.rom.program:
+                for op, args in inst.items():
+                    getattr(self, op)(args)
+                    if self.echo:
+                        print(f'{op} {args}')
+                    match op:
+                        case 'ADD':
+                            self.ADD(args)
+                        case 'SUB':
+                            self.SUB(args)
+                        case 'AND':
+                            self.AND(args)
+                        case 'OR':
+                            self.OR(args)
+                        case 'XOR':
+                            self.XOR(args)
+                        case 'NOT':
+                            self.NOT(args)
+                        case 'MOV':
+                            self.MOV(args)
+                        case 'IN':
+                            self.IN(args)
+                        case 'OUT':
+                            self.OUT(args)     
         
-        def hart(self) -> None:
-            while True:
-                pass
+        def ADD(self, args: list) -> None:
+            try:
+                self.dreg[args[0]] += self.dreg[args[1]]
+            except KeyError:
+                self.dreg[args[0]] += int(args[1])
+            return None
+
+        def SUB(self, args: list) -> None:
+            try:
+                self.dreg[args[0]] -= self.dreg[args[1]]
+            except KeyError:
+                self.dreg[args[0]] -= int(args[1])
+            return None
+
+        def AND(self, args: list) -> None:
+            try:
+                self.dreg[args[0]] &= self.dreg[args[1]]
+            except KeyError:
+                self.dreg[args[0]] &= int(args[1])
+            return None
+    
+        def OR(self, args: list) -> None:
+            try:
+                self.dreg[args[0]] |= self.dreg[args[1]]
+            except KeyError:
+                self.dreg[args[0]] |= int(args[1])
+            return None
+
+        def XOR(self, args: list) -> None:
+            try:
+                self.dreg[args[0]] ^= self.dreg[args[1]]
+            except KeyError:
+                self.dreg[args[0]] ^= int(args[1])
+            return None
+        
+        def NOT(self, args: list) -> None:
+            try:
+                self.dreg[args[0]] = ~self.dreg[args[0]]
+            except KeyError:
+                self.dreg[args[0]] = ~int(args[0])
+            return None
+
+        def MOV(self, args: list) -> None:
+            try:
+                self.dreg[args[0]] = self.dreg[args[1]]
+            except KeyError:
+                try:
+                    self.dreg[args[0]] = int(args[1])
+                except ValueError:
+                    dir = int(args[1].replace('(','').replace(')',''))
+                    self.dreg[args[0]] = self.ram.memory(dir)
+            return None
+
+        def IN(self, args: list) -> None:
+            try:
+                self.dreg[args[0]] = self.csr[0]
+            except KeyError:
+                self.dreg[args[0]] = int(args[0])
+            return None
+
+        def OUT(self, args: list) -> None:
+            try:
+                self.csr[0] = self.dreg[args[0]]
+            except KeyError:
+                self.csr[0] = int(args[0])
+            return None
     
 
     class RAM():

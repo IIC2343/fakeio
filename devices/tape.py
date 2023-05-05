@@ -11,8 +11,26 @@ class Tape():
         logging.basicConfig(filename=LOGS, level=logging.DEBUG, filemode='a')
         self.tape = bytearray()
         self.head = 0
+        self.nbytes = 0
         self.length = 0
         self.head = 0
+        self.target_dir = 0x00
+    
+    @property
+    def nbytes(self) -> int:
+        return self.nbytes
+
+    @nbytes.setter
+    def nbytes(self, value: int) -> None:
+        self.nbytes = value
+    
+    @property
+    def target_dir(self) -> int:
+        return self.target_dir
+    
+    @target_dir.setter
+    def target_dir(self, value: int) -> None:
+        self.target_dir = value
     
     def mount(self, tapedir: str) -> None:
         tape_path = os.path.join(os.getcwd, tapedir)
@@ -27,7 +45,7 @@ class Tape():
         with open(tape_path, 'wb') as tape:
             tape.write(self.tape)
 
-    def read(self, pointer: int, nbytes: int=0) -> str:
+    def read(self, pointer: int) -> str:
         def seek_delay(head: int, pointer: int) -> None:
             time.sleep(abs(head - pointer) / 10)
         def read_delay(nbytes: int) -> None:
@@ -45,7 +63,7 @@ class Tape():
         data = data.decode('utf-8')
         return data
 
-    def write(self, pointer: int, data: str) -> None:
+    def write(self, pointer: int) -> None:
         def seek_delay(head: int, pointer: int) -> None:
             time.sleep(abs(head - pointer) / 10)
         def write_delay(nbytes: int) -> None:
