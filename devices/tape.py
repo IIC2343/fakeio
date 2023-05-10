@@ -11,10 +11,9 @@ class Tape():
         logging.basicConfig(filename=LOGS, level=logging.DEBUG, filemode='a')
         self.tape = bytearray()
         self.head = 0
+        self.next_head = 0
         self.nbytes = 0
         self.length = 0
-        self.head = 0
-        self.target_dir = 0x00
     
     @property
     def head(self) -> int:
@@ -22,7 +21,7 @@ class Tape():
 
     @head.setter
     def head(self, value: int) -> None:
-        self.read(value)
+        self.next_head = value
     
     @property
     def nbytes(self) -> int:
@@ -32,28 +31,31 @@ class Tape():
     def nbytes(self, value: int) -> None:
         self.nbytes = value
     
-    @property
-    def target_dir(self) -> int:
-        return self.target_dir
-    
-    @target_dir.setter
-    def target_dir(self, value: int) -> None:
-        self.target_dir = value
+    def use(self, opt: str, data: int) -> None:
+        match opt:
+            case 'read':
+                self.__read(data)
+            case 'write':
+                self.__write(data)
+            case 'nbytes':
+                self.nbytes = data
+            case 'head':
+                self.head = data
     
     def mount(self, tapedir: str) -> None:
         tape_path = os.path.join(os.getcwd, tapedir)
-        logging.debug(f'Tape mounted at {tape_path}')
         with open(tape_path, 'rb') as tape:
             self.tape = tape.read()
             self.length = len(self.tape)
+        logging.debug(f'Tape mounted at {tape_path}')
     
     def unmount(self, tapedir: str) -> None:
         tape_path = os.path.join(os.getcwd, tapedir)
-        logging.debug(f'Tape unmounted from {tape_path}')
         with open(tape_path, 'wb') as tape:
             tape.write(self.tape)
+        logging.debug(f'Tape unmounted from {tape_path}')
 
-    def read(self, pointer: int) -> str:
+    def __read(self, pointer: int) -> str:
         def seek_delay(head: int, pointer: int) -> None:
             time.sleep(abs(head - pointer) / 10)
         def read_delay() -> None:
@@ -71,11 +73,12 @@ class Tape():
         data = data.decode('utf-8')
         return data
 
-    def write(self, pointer: int) -> None:
+    def __write(self, data: str) -> None:
         def seek_delay(head: int, pointer: int) -> None:
             time.sleep(abs(head - pointer) / 10)
         def write_delay(nbytes: int) -> None:
             time.sleep(nbytes / 10)
+        pointer = self.next_head
         if pointer > self.length:
             logging.debug(f'Pointer {pointer} is out of range')
             return None

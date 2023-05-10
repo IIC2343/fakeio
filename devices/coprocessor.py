@@ -8,22 +8,27 @@ LOGS = os.path.join(os.path.dirname(__file__), './logs/entropy.logs')
 class Coprocessor():
     def __init__(self) -> None:
         logging.basicConfig(filename=LOGS, level=logging.DEBUG, filemode='a')
-        self.registers = {"A": float(), "B": float()}
-        self.allowed_operations = ["FADD", "FSUB", "FMUL", "FDIV"]
+        self.registers = {"A": float(), "B": float(), "OP": int()}
+        self.op_map = {0: "FADD", 1: "FSUB", 2: "FMUL", 3: "FDIV"}
         self.operation = str()
     
-    @property
-    def operation(self) -> str:
-        return self.operation
-
-    @operation.setter
-    def operation(self, value: str) -> None:
-        if value not in self.allowed_operations:
-            logging.debug(f'Operation {value} is not allowed')
-            return None
-        self.operation = value
+    def use(self, opt: str, data: int) -> None:
+        match opt:
+            case 'A':
+                self.registers["A"] = data
+            case 'B':
+                self.registers["B"] = data
+            case 'OP':
+                self.registers["OP"] = data
+            case 'run':
+                self.__run()
     
-    def run(self) -> None:
+    def __run(self) -> None:
+        try:
+            self.operation = self.op_map[self.registers["OP"]]
+        except KeyError:
+            logging.debug(f'Operation {self.registers["OP"]} is not allowed')
+            return None
         if self.operation == "FADD":
             self.registers["A"] += self.registers["B"]
         elif self.operation == "FSUB":

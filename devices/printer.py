@@ -11,7 +11,12 @@ class Printer():
     def __init__(self) -> None:
         logging.basicConfig(filename=LOGS, level=logging.DEBUG, filemode='a')
     
-    def print(self, data: int) -> None:
+    def use(self, opt: str, data: int) -> None:
+        match opt:
+            case 'print':
+                self.__print(data)
+
+    def __print(self, data: int) -> None:
         data = chr(data)
         logging.debug(f'Printer is printing {data}')
         time.sleep(len(data) / 10)

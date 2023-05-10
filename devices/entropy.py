@@ -14,7 +14,11 @@ class Entropy():
     def __init__(self) -> None:
         logging.basicConfig(filename=LOGS, level=logging.DEBUG, filemode='a')
     
-    def get(self, length: int) -> int:
-        logging.debug(f'Entropy is generating {length} bytes')
+    def use(self, opt: str, data: int) -> None:
+        match opt:
+            case 'get':
+                self.__get()
+
+    def __get(self) -> int:
         time.sleep(random.random(0, 1))
-        return random.getrandbits(length)
+        return random.randint(0, 255)
