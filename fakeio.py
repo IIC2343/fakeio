@@ -2,6 +2,7 @@
 
 import os
 import logging
+import time
 
 import devices as dv
 
@@ -10,14 +11,14 @@ LOGS = os.path.join(os.path.dirname(__file__), './logs/pmio.logs')
 class PMIO():
     def __init__(self) -> None:
         logging.basicConfig(filename=LOGS, level=logging.DEBUG, filemode='a')
-        logging.debug('PMIO initialized')
+        logging.debug(f'PMIO initialized at {time.time()}')
         self.devices = {
             "printer": dv.Printer(), "coprocessor": dv.Coprocessor(),
             "entropy": dv.Entropy(), "tape": dv.Tape()
         }
         self.port_map = {
             0: "print",     # printer print
-            1: "get",       # entropy get bits
+            1: "get",       # entropy get number
             2: "read",      # tape read nbytes from from head
             3: "write",     # tape write data to tape at head
             4: "nbytes",    # tape set nbytes
@@ -54,7 +55,7 @@ class PMIO():
             logging.error(f'Port {port} is not allowed')
             return None
         if opt == "read":
-            out = self.devices["tape"].use(opt, data)
+            out = str(self.devices["tape"].use(opt, data))
         elif opt == "get":
             out = str(self.devices["entropy"].use(opt, data))
         elif opt == "run":

@@ -26,6 +26,9 @@ class Coprocessor():
                 return ret
     
     def __run(self) -> None:
+        if not self.registers["OP"]:
+            logging.debug(f'OP register not set')
+            return None
         try:
             self.operation = self.op_map[self.registers["OP"]]
         except KeyError:
