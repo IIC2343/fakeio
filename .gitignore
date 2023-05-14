@@ -1,1 +1,6 @@
-global-exclude __pycache__
+paper.txt
+pmio.logs
+maker.py
+lyrics.txt
+__pycache__
+/.vscode

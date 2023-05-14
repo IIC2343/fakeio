@@ -17,8 +17,9 @@ class Entropy():
     def use(self, opt: str, data: int) -> None:
         match opt:
             case 'get':
-                self.__get()
+                ret = self.__get()
+                return ret
 
     def __get(self) -> int:
-        time.sleep(random.random(0, 1))
+        time.sleep(random.randint(0, 5))
         return random.randint(0, 255)

@@ -13,6 +13,7 @@ class Coprocessor():
         self.operation = str()
     
     def use(self, opt: str, data: int) -> None:
+        logging.debug(f'Coprocessor used with {opt} {f"and {data}" if data else ""}')
         match opt:
             case 'A':
                 self.registers["A"] = data
@@ -21,7 +22,8 @@ class Coprocessor():
             case 'OP':
                 self.registers["OP"] = data
             case 'run':
-                self.__run()
+                ret = self.__run()
+                return ret
     
     def __run(self) -> None:
         try:
@@ -38,4 +40,4 @@ class Coprocessor():
         elif self.operation == "FDIV":
             self.registers["A"] /= self.registers["B"]
         logging.debug(f'Operation {self.operation} ran')
-        return None
+        return self.registers["A"]
