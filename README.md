@@ -29,3 +29,7 @@ Representa a una cita magnética (extremadamente abstraída). Esta permite leer 
 ## Logfile
 
 Casi todas las acciones que realiza la librería y los errores que puedan ocurrir se van escribiendo al archivo `./logs/pmio.logs`.
+
+## Ejemplo de ejecución
+
+En el archivo `main.py` puede encontrar un ejemplo de cómo hacer uso de este módulo para interactuar con los distintos dispositivos existentes.
