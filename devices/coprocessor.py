@@ -10,10 +10,10 @@ class Coprocessor():
         logging.basicConfig(filename=LOGS, level=logging.DEBUG, filemode='a')
         self.registers = {"A": float(), "B": float(), "OP": int()}
         self.op_map = {0: "FADD", 1: "FSUB", 2: "FMUL", 3: "FDIV"}
-        self.operation = str()
+        self.operation = None
     
     def use(self, opt: str, data: int) -> None:
-        logging.debug(f'Coprocessor used with {opt} {f"and {data}" if data else ""}')
+        logging.debug(f'Coprocessor used with {opt} {f"and {data}" if data is not None else ""}')
         match opt:
             case 'A':
                 self.registers["A"] = data
@@ -26,7 +26,7 @@ class Coprocessor():
                 return ret
     
     def __run(self) -> None:
-        if not self.registers["OP"]:
+        if self.registers["OP"] is None:
             logging.debug(f'OP register not set')
             return None
         try:
