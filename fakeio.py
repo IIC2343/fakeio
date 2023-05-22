@@ -26,7 +26,8 @@ class PMIO():
             6: "A",         # coprocessor A
             7: "B",         # coprocessor B
             8: "OP",        # coprocessor OP
-            9: "run"        # coprocessor run
+            9: "run",       # coprocessor run
+            10: "length"    # tape get length
         }
 
     def OUT(self, port: int, data: int) -> int:
@@ -54,7 +55,7 @@ class PMIO():
         except KeyError:
             logging.error(f'Port {port} is not allowed')
             return None
-        if opt == "read":
+        if opt == "read" or opt == "length":
             out = str(self.devices["tape"].use(opt, data))
         elif opt == "get":
             out = str(self.devices["entropy"].use(opt, data))

@@ -23,6 +23,9 @@ class Tape():
 
     @head.setter
     def head(self, value: int) -> None:
+        if value < 0:
+            logging.debug(f'Head {value} cannot be negative')
+            return None
         self.next_head = value
     
     @property
@@ -44,6 +47,8 @@ class Tape():
                 self.nbytes = data
             case 'head':
                 self.head = data
+            case 'length':
+                return str(self.length)
     
     def mount(self, tapedir: str) -> None:
         tape_path = os.path.join(os.path.dirname(__file__), tapedir)
